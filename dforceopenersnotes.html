@@ -1,0 +1,566 @@
+<div class="form-container">
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab(this, 'OUTBOUND')">Outbound</div>
+    <div class="tab" onclick="switchTab(this, 'CALLBACK')">Callback</div>
+    <div class="tab" onclick="switchTab(this, 'INBOUND')">Inbound</div>
+    <div class="tab" onclick="switchTab(this, 'OBJECTIONS')">Objections</div>
+  </div>
+
+  <div class="form-body">
+    <div id="comingSoonContent" class="coming-soon" style="display: none;">
+      Coming soon
+    </div>
+
+    <form id="openerForm">
+      <div class="input-row pair-row">
+        <div class="form-group flex-1">
+          <input type="text" id="businessName" placeholder="Business Name">
+        </div>
+        <div class="form-group flex-1">
+          <input type="tel" id="phoneNumber" placeholder="Phone Number" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Keywords</label>
+        <div class="input-row multi-inline">
+          <input type="text" id="keyword1" placeholder="Keyword 1">
+          <input type="text" id="keyword2" placeholder="Keyword 2">
+          <input type="text" id="keyword3" placeholder="Keyword 3">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Competitors</label>
+        <div class="input-row multi-inline">
+          <input type="text" id="competitor1" placeholder="Competitor 1">
+          <input type="text" id="competitor2" placeholder="Competitor 2">
+          <input type="text" id="competitor3" placeholder="Competitor 3">
+        </div>
+      </div>
+
+      <div class="input-row pair-row triple-inline">
+        <div class="form-group flex-1">
+          <label>Business Age</label>
+          <input type="text" id="businessAge" placeholder="e.g. 5">
+        </div>
+        <div class="form-group flex-1">
+          <label>Full Time</label>
+          <select id="fullTime" required>
+            <option value=""></option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+        <div class="form-group flex-1">
+          <label>Over 18 years old</label>
+          <select id="over18" required>
+            <option value=""></option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-row pair-row triple-inline">
+        <div class="form-group flex-1">
+          <label>Facebook</label>
+          <input type="text" id="facebook" placeholder="Facebook">
+        </div>
+        <div class="form-group flex-1">
+          <label>Instagram</label>
+          <input type="text" id="instagram" placeholder="Instagram">
+        </div>
+        <div class="form-group flex-1">
+          <label>GMB</label>
+          <select id="gmb" required>
+            <option value=""></option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Customer Name</label>
+        <input type="text" id="customerName" placeholder="Enter customer name">
+      </div>
+
+      <div class="form-group">
+        <label>Referral Code</label>
+        <input type="text" id="referralCode" value="CC823" readonly style="background-color: #f3ebd4 !important; border: 1px solid #f3ebd4 !important; cursor: not-allowed; color: #7c411b !important; font-weight: bold;">
+      </div>
+
+      <div class="form-group">
+        <label>Other Notes</label>
+        <textarea id="otherNotes" rows="4" placeholder="Add any additional notes here..."></textarea>
+      </div>
+
+      <button type="button" class="btn-copy" onclick="copyAllInfo()">COPY</button>
+      <div class="button-row">
+        <button type="button" class="btn-reset" onclick="clearAll()">Reset</button>
+        <button type="button" class="btn-undo" id="btnUndo" onclick="undoClear()" disabled>Undo</button>
+      </div>
+    </form>
+
+    <form id="inboundForm" style="display: none;">
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="inboundPhoneNumber" placeholder="Phone number" class="invalid-length" maxlength="10" oninput="validateInboundPhone(this)">
+      </div>
+      <button type="button" class="btn-profile" onclick="openBusinessProfile()">Open Business Profile</button>
+    </form>
+  </div>
+</div>
+
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .form-container {
+    width: 100%;
+    max-width: 450px;
+    background-color: #fffbeb;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(124, 65, 27, 0.08);
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .tabs {
+    display: flex;
+    background-color: #f5ebd6;
+    padding: 8px;
+    gap: 6px;
+    overflow-x: auto;
+    border-bottom: 1px solid #e3d7b9;
+    justify-content: center;
+    scrollbar-width: none;
+  }
+  
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab {
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #7c411b;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s, color 0.2s;
+    flex-shrink: 0;
+  }
+
+  .tab:hover:not(.active) {
+    background-color: rgba(124, 65, 27, 0.06);
+  }
+
+  .tab.active {
+    background-color: #7c411b;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(124, 65, 27, 0.2);
+  }
+
+  .form-body {
+    padding: 24px 20px;
+  }
+
+  .coming-soon {
+    text-align: center;
+    color: #7c411b;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 60px 0;
+  }
+
+  .form-group {
+    margin-bottom: 18px;
+  }
+
+  .pair-row {
+    margin-bottom: 18px;
+  }
+
+  .pair-row .form-group {
+    margin-bottom: 0;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #7c411b;
+    margin-bottom: 6px;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-row input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .flex-1 {
+    flex: 1;
+    min-width: 0;
+  }
+
+  input[type="text"],
+  input[type="tel"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #c93b2b;
+    border-radius: 8px;
+    background-color: #fff5f5;
+    font-size: 14px;
+    box-sizing: border-box;
+    color: #333333;
+    outline: none;
+    height: 45px;
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+
+  input[type="text"]:not(:placeholder-shown),
+  input[type="tel"]:not(:placeholder-shown) {
+    border: 1px solid #2ecc71;
+    background-color: #f5fff7;
+  }
+
+  #inboundPhoneNumber.invalid-length {
+    border: 1px solid #c93b2b !important;
+    background-color: #fff5f5 !important;
+  }
+
+  #inboundPhoneNumber.valid-length {
+    border: 1px solid #2ecc71 !important;
+    background-color: #f5fff7 !important;
+  }
+
+  textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #bcbcbc;
+    border-radius: 8px;
+    background-color: #ffffff !important;
+    font-size: 14px;
+    box-sizing: border-box;
+    color: #333333;
+    outline: none;
+    height: auto;
+    transition: border-color 0.2s;
+  }
+  
+  textarea:focus {
+    border-color: #7c411b;
+  }
+
+  select {
+    width: 100%;
+    padding: 12px 35px 12px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    color: #333333;
+    outline: none;
+    height: 45px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+
+  select:invalid {
+    border: 1px solid #c93b2b;
+    background-color: #fff5f5;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c93b2b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+  }
+
+  select:valid {
+    border: 1px solid #2ecc71;
+    background-color: #f5fff7;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%232ecc71' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #bcbcbc;
+  }
+
+  .btn-copy, .btn-profile {
+    width: 100%;
+    background-color: #7c411b;
+    color: #ffffff;
+    border: none;
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background 0.2s;
+  }
+
+  .btn-copy:hover, .btn-profile:hover {
+    background-color: #633314;
+  }
+
+  .button-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .button-row .btn-reset,
+  .button-row .btn-undo {
+    flex: 1;
+    margin-top: 0;
+  }
+
+  .btn-reset {
+    background-color: #ffffff;
+    color: #c93b2b;
+    border: 1px solid #f3ebd4;
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-reset:hover {
+    background-color: #fff5f5;
+  }
+
+  .btn-undo {
+    background-color: #ffffff;
+    color: #7c411b;
+    border: 1px solid #f3ebd4;
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: not-allowed;
+    opacity: 0.5;
+    transition: background 0.2s, opacity 0.2s;
+  }
+
+  .btn-undo:hover:not(:disabled) {
+    background-color: #f5ebd6;
+  }
+
+  /* Responsive Rules to Prevent Text Cutting Off */
+  @media (max-width: 420px) {
+    .tabs {
+      justify-content: flex-start;
+      padding-left: 4px;
+      padding-right: 4px;
+    }
+    
+    .multi-inline {
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .triple-inline {
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .triple-inline .form-group {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  let activeTabName = 'OUTBOUND';
+  let lastFormState = null;
+
+  function switchTab(element, tabName) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    element.classList.add('active');
+    activeTabName = tabName;
+
+    const outboundForm = document.getElementById('openerForm');
+    const inboundForm = document.getElementById('inboundForm');
+    const comingSoon = document.getElementById('comingSoonContent');
+
+    outboundForm.style.display = 'none';
+    inboundForm.style.display = 'none';
+    comingSoon.style.display = 'none';
+
+    if (tabName === 'OUTBOUND') {
+      outboundForm.style.display = 'block';
+    } else if (tabName === 'INBOUND') {
+      inboundForm.style.display = 'block';
+    } else {
+      comingSoon.style.display = 'block';
+    }
+  }
+
+  function validateInboundPhone(input) {
+    input.value = input.value.replace(/[^0-9]/g, '');
+    
+    if (input.value.length === 10) {
+      input.classList.remove('invalid-length');
+      input.classList.add('valid-length');
+    } else {
+      input.classList.remove('valid-length');
+      input.classList.add('invalid-length');
+    }
+  }
+
+  function openBusinessProfile() {
+    const phoneInput = document.getElementById('inboundPhoneNumber');
+    const phoneNumber = phoneInput ? phoneInput.value.trim() : '';
+    const targetUrl = `https://plugins.adiq.com/wizards/select?phone=${phoneNumber}&campaign=`;
+    window.open(targetUrl, '_blank');
+  }
+
+  function copyAllInfo() {
+    const parts = [];
+
+    function addField(label, id) {
+      const el = document.getElementById(id);
+      if (el) {
+        const val = el.value.trim();
+        if (val !== '') {
+          parts.push(`${label}: ${val}`);
+        }
+      }
+    }
+
+    addField('Customer Name', 'customerName');
+    addField('Business Name', 'businessName');
+    addField('Phone Number', 'phoneNumber');
+
+    const keywords = [
+      document.getElementById('keyword1').value.trim(),
+      document.getElementById('keyword2').value.trim(),
+      document.getElementById('keyword3').value.trim()
+    ].filter(val => val !== '');
+    if (keywords.length > 0) {
+      parts.push(`Keywords: ${keywords.join(', ')}`);
+    }
+
+    const competitors = [
+      document.getElementById('competitor1').value.trim(),
+      document.getElementById('competitor2').value.trim(),
+      document.getElementById('competitor3').value.trim()
+    ].filter(val => val !== '');
+    if (competitors.length > 0) {
+      parts.push(`Competitors: ${competitors.join(', ')}`);
+    }
+
+    addField('Business Age', 'businessAge');
+    addField('Full-Time', 'fullTime');
+    addField('Over the age of 18?', 'over18');
+    addField('Facebook', 'facebook');
+    addField('Instagram', 'instagram');
+    addField('GMB?', 'gmb');
+    addField('Other Notes', 'otherNotes');
+    addField('Referral Code', 'referralCode');
+
+    if (parts.length === 0) {
+      alert('All fields are empty. Nothing to copy!');
+      return;
+    }
+
+    executeCopy(parts.join(' | '));
+  }
+
+  function executeCopy(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    textarea.setSelectionRange(0, 99999);
+
+    try {
+      const success = document.execCommand('copy');
+      if (success) {
+        alert('Data copied to clipboard format successfully!');
+      } else {
+        throw new Error('execCommand failed');
+      }
+    } catch (err) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Data copied to clipboard format successfully!');
+      }).catch(() => {
+        alert('Copy execution failed. Please verify window script permissions.');
+      });
+    }
+    document.body.removeChild(textarea);
+  }
+
+  function clearAll() {
+    const form = document.getElementById('openerForm');
+    if (!form) return;
+    
+    lastFormState = {};
+    const inputs = form.querySelectorAll('input, select, textarea');
+    
+    inputs.forEach(input => {
+      if (input.id) {
+        lastFormState[input.id] = input.value;
+        
+        if (input.id !== 'referralCode') {
+          if (input.tagName === 'SELECT') {
+            input.selectedIndex = 0;
+          } else {
+            input.value = '';
+          }
+          
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+    });
+
+    const undoBtn = document.getElementById('btnUndo');
+    if (undoBtn) {
+      undoBtn.disabled = false;
+      undoBtn.style.opacity = "1";
+      undoBtn.style.cursor = "pointer";
+    }
+  }
+
+  function undoClear() {
+    if (!lastFormState) return;
+
+    for (const id in lastFormState) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.value = lastFormState[id];
+        element.dispatchEvent(new Event('input', { bubbles: true }));
+        element.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+
+    lastFormState = null;
+    const undoBtn = document.getElementById('btnUndo');
+    if (undoBtn) {
+      undoBtn.disabled = true;
+      undoBtn.style.opacity = "0.5";
+      undoBtn.style.cursor = "not-allowed";
+    }
+  }
+</script>
